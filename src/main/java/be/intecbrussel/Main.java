@@ -53,10 +53,11 @@ public class Main {
 
             String sql = "Insert into Beers (Name,Alcohol) Values('Bruwdog','4');";
             String sql2 = "Delete from Beers where name like 'Bruwdog'";
-            String sql3 = "Update Beers SET Alcohol = 10;";
+            String sql3 = "Update Beers SET Alcohol = ? WHERE id = ?";
 
 
             statement.executeUpdate(sql);
+            connection.prepareStatement("Update Beers SET Alcohol = 10 ");
             rs = statement.executeQuery("Select * from Beers");
 
             while (rs.next()) {
@@ -67,12 +68,12 @@ public class Main {
             }
 
         } catch (SQLException s) {
+
             s.printStackTrace();
-            System.out.println("Error");
+
         }
 
-
-        //        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/beersdb?serverTimezone=UTC", "root", "")) {
+//        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/beersdb?serverTimezone=UTC", "root", "")) {
 //
 //            try {
 //                query = connection.prepareStatement("SELECT name,alcohol FROM Beers");
@@ -80,7 +81,7 @@ public class Main {
 //                while (rs.next()) {
 //                    System.out.print(rs.getString("name") + " - ");
 //                    System.out.println(rs.getString("alcohol"));
-////
+//
 //
 //                }
 //            } catch (Exception e) {
