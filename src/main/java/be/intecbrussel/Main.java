@@ -2,6 +2,9 @@ package be.intecbrussel;
 
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class Main {
 
@@ -10,18 +13,30 @@ public class Main {
 
 
         PreparedStatement query;
+        List<Beer> beerList = new ArrayList<>();
+        ResultSet rs;
 
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/beersdb?serverTimezone=UTC", "root", "")) {
-
             try {
-
                 Statement statement = connection.createStatement();
-                ResultSet rs = statement.executeQuery("SELECT * FROM Categories");
-                
+                rs = statement.executeQuery("Select * from Beers");
+
+
                 while (rs.next()) {
-                    System.out.print(rs.getString("id") + " - ");
-                    System.out.println(rs.getString("category"));
+                    //parse resultset record
+
+                    beerList.add(new Beer(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getInt("brewerId"),
+                            rs.getFloat("Price"),
+                            rs.getInt("Stock"),
+                            rs.getFloat("Alcohol"),
+                            rs.getInt("Version")
+                    ));
                 }
+
+
             } catch (Exception e) {
             }
 
@@ -29,24 +44,51 @@ public class Main {
             e.printStackTrace();
         }
 
+        beerList.forEach(System.out::println);
 
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/beersdb?serverTimezone=UTC", "root", "")) {
+        Dbconnector dbconnector = new Dbconnector();
 
-            try {
-                query = connection.prepareStatement("SELECT name,alcohol FROM Beers");
-                ResultSet rs = query.executeQuery();
-                while (rs.next()) {
-                    System.out.print(rs.getString("name") + " - ");
-                    System.out.println(rs.getString("alcohol"));
+        try (Connection connection = dbconnector.getConnection();
+             Statement statement = connection.createStatement();) {
+
+            String sql = "Insert into Beers (Name,Alcohol) Values('Bruwdog','4');";
+            String sql2 = "Delete from Beers where name like 'Bruwdog'";
+            String sql3 = "Update Beers SET Alcohol = 10;";
+
+
+            statement.executeUpdate(sql);
+            rs = statement.executeQuery("Select * from Beers");
+
+            while (rs.next()) {
+                System.out.print(rs.getInt("id") + "-");
+                System.out.print(rs.getString("Name") + "-");
+                System.out.println(rs.getString("brewerid"));
+
+            }
+
+        } catch (SQLException s) {
+            s.printStackTrace();
+            System.out.println("Error");
+        }
+
+
+        //        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/beersdb?serverTimezone=UTC", "root", "")) {
 //
-
-                }
-            } catch (Exception e) {
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+//            try {
+//                query = connection.prepareStatement("SELECT name,alcohol FROM Beers");
+//                ResultSet rs = query.executeQuery();
+//                while (rs.next()) {
+//                    System.out.print(rs.getString("name") + " - ");
+//                    System.out.println(rs.getString("alcohol"));
+////
+//
+//                }
+//            } catch (Exception e) {
+//            }
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
 
     }
